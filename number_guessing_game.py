@@ -2,9 +2,14 @@
 import pyautogui
 from random import randint
 
+def play_game() -> bool:
+    """Ask the player to either play the game or not"""
+    responce = pyautogui.confirm(f"Do you want to play?", buttons=["Yes", "No"])
+    return responce == "Yes"
+
 
 def valid_input(x:str) -> bool:
-    """Check if the user input is an integer or not"""
+    """Check if the player input is an integer or not"""
     if not x.isdigit() or x is None:
         pyautogui.alert(f"Enter a valid input", f"Error")
         return False
@@ -38,16 +43,24 @@ def get_interval() -> list[int]:
 
 
 def guess(a:int,b:int) -> int:
-    """Get the user guesseed number that fit in the interval [a,b]"""
+    """Get the player guessed number that fit in the interval [a,b]"""
     while True:
         try:
-            user_num = pyautogui.propmt(f"The number is between {a} and {b}, guess it:", f"Input")
-            if valid_input(user_num):
-                user_num = int(user_num)
-                return user_num
+            player_num = pyautogui.propmt(f"The number is between {a} and {b}, guess it:", f"Input")
+            if valid_input(player_num) and a <= player_num <= b:
+                player_num = int(player_num)
+                return player_num
         except ValueError as e:
             pyautogui.alert(f'{e}')
 
+
+def get_hint(player_num:int, computer_num:int) -> None:
+    """Get hints to help the player guess the number"""
+    if player_num < computer_num:
+        pyautogui.alert(f"Your number is lower.", "Hint")
+    else:
+        pyautogui.alert(f"Your number is higher", "Hint")
+    return
 
 if __name__ == "__main__":
     pass
