@@ -8,6 +8,7 @@ def play_game() -> bool:
     while True:
         # Get the user responce 'Y' for yes and 'N' for no
         responce = input(f"Do you want to play [Y/N]: ")
+        # Treat different input case
         match responce.upper():
             case 'Y':
                 return True
@@ -29,17 +30,20 @@ def welcoming(chance:int) -> None:
 
 def select_difficulty() -> int:
     """Select the difficulity level for the number of chances """
-    
     difficulity = {"1": ["Easy",10], "2": ["Medium", 5], "3": ["Hard", 3]}
 
+    # Print the difficulty menu
     print("\nPlease select the difficulty lever:")
     print("1. Easy (10 chances)")
     print("2. Medium (5 chances)")
     print("3. Hard (3 chances)\n")
-
+    
+    # Select the diffuclty level
     while True:
         choice = input("Enter your choice: ")
+        # Check if the input number exists in the difficulty dictionary 
         if choice in difficulity.keys():
+            # Print a message of the difficulty chosen and return the number of chances
             print(f"\nGreat! You have selected the {difficulity[choice][0]} difficulty level.")
             print(f"Let's start the game")
             return difficulity[choice][1]
@@ -50,7 +54,7 @@ def select_difficulty() -> int:
 def valid_input(x:str) -> bool:
     """Check if the player input is an integer or not"""
     if not x.isdigit():
-        print(f"Enter a valid input")
+        print(f"Invalid Input: Try again")
         return False
     return True
 
@@ -59,6 +63,7 @@ def guess(chance:int) -> int:
     """Get the player guessed number that fit in the interval [a,b]"""
     while True:
         try:
+            # Get the user input and check if it's valid or not
             player_num = input(f"\nEnter your guess: ").strip()
             if valid_input(player_num):
                 player_num = int(player_num)
@@ -79,6 +84,7 @@ def get_hint(player_num:int, computer_num:int) -> None:
 
 
 def is_guessed(player_num:int, computer_num:int, attempt:int, start_time: float) -> bool:
+    """Check if the player guessed the number"""
     if computer_num == player_num:
         end_time = time()
         delay = int(end_time - start_time)
@@ -90,10 +96,12 @@ def is_guessed(player_num:int, computer_num:int, attempt:int, start_time: float)
 
 
 def add_highscore(score:int , highscore:list[int]) -> None:
+        """Append the score of the current game to the highsore list"""
         highscore.append(score)
 
 
 def display_highscore(highscore:list[int]):
+    """Ask the user weither to display their highscore or not"""
     responce = input(f"\nDo you want to display the highscore [Y/N]").strip().lower()
     if responce == "Yes" and highscore:
         print(f"You highscore is {min(highscore)}")
@@ -114,9 +122,9 @@ def play() -> None:
     # Select the diffucilty and display a welcomin window
     chance = select_difficulty()
     welcoming(chance)
-
+    
+    # Initialise the timer
     start_time = time()
-
     
     # Try to guess the number
     for attempt in range(1, chance+1):
@@ -126,7 +134,7 @@ def play() -> None:
             display_highscore(highscore)
             return None
 
-    # Displayt the message that the user lost
+    # Display the message that the user lost
     print(f"You run out of chances, the number to guess was {computer_num}")
     return None
     
