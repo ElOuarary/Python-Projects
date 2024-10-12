@@ -1,114 +1,133 @@
 # Import the necessary module
-import pyautogui
 from random import randint
+from time import time
 
 
 def play_game() -> bool:
     """Ask the player to either play the game or not"""
-    responce = pyautogui.confirm(f"Do you want to play?", "Main Menu",buttons=["Yes", "No"])
-    return responce == "Yes"
+    while True:
+        # Get the user responce 'Y' for yes and 'N' for no
+        responce = input(f"Do you want to play [Y/N]: ")
+        match responce.upper():
+            case 'Y':
+                return True
+            case 'N':
+                return False
+            case _:
+                print('Invalid Input: Try again.\n')
+                continue
 
 
-def welcoming(a:int, b:int, chance:int) -> None:
+
+def welcoming(chance:int) -> None:
     """Display the welcoming Page"""
-    pyautogui.alert(f'''Welcome to the Number Guessing Game!\nI'm thinking of a number between {a} and {b}.\nYou have {chance} chances to guess the correct number.''')
+    print(f"\nWelcome to the Number Guessing Game!")
+    print(f"I'm thinking of a number between 1 and 100.")
+    print(f"You have {chance} chances to guess the correct number.")
+    return None
     
 
-def select_difficulity() -> int:
+def select_difficulty() -> int:
     """Select the difficulity level for the number of chances """
-    responce = pyautogui.confirm(f"Select your diffucilty level:", "Configuration", buttons=["Easy","Medium","Hard"])
-    match responce:
-        case "Easy":
-            return 10
-        case "Medium":
-            return 5
-        case _:
-            return 3
+    
+    difficulity = {"1": ["Easy",10], "2": ["Medium", 5], "3": ["Hard", 3]}
+
+    print("\nPlease select the difficulty lever:")
+    print("1. Easy (10 chances)")
+    print("2. Medium (5 chances)")
+    print("3. Hard (3 chances)\n")
+
+    while True:
+        choice = input("Enter your choice: ")
+        if choice in difficulity.keys():
+            print(f"\nGreat! You have selected the {difficulity[choice][0]} difficulty level.")
+            print(f"Let's start the game")
+            return difficulity[choice][1]
+        else:
+            print("\nInvalid Input: try again.")
         
 
 def valid_input(x:str) -> bool:
     """Check if the player input is an integer or not"""
-    if not x.isdigit() or x is None:
-        pyautogui.alert(f"Enter a valid input", f"Error")
+    if not x.isdigit():
+        print(f"Enter a valid input")
         return False
     return True
 
 
-def get_interval() -> list[int]:
-    """Get the interval to generater an random number between it"""
-    while True:
-        try:
-            a = pyautogui.prompt(f"Enter the lower bound: ", f"Input")
-            if valid_input(a):
-                a = int(a)
-            else:
-                continue
-            
-            b = pyautogui.prompt(f"Enter the upper bound: ", f"Input")
-            if valid_input(b):
-                b = int(b)
-            else:
-                continue
-
-            if a >= b:
-                pyautogui.alert(f"The lower bound is superior or equal to your upper bound", f"Error")
-                continue
-            else:
-                return [a,b]
-
-        except ValueError as e:
-            pyautogui.alert(f"{e}", f"Error")
-
-
-def guess(a:int, b:int, chance:int) -> int:
+def guess(chance:int) -> int:
     """Get the player guessed number that fit in the interval [a,b]"""
     while True:
         try:
-            player_num = pyautogui.prompt(f"The number is between {a} and {b}, {chance} chances left, guess it:", f"Input")
+            player_num = input(f"\nEnter your guess: ").strip()
             if valid_input(player_num):
                 player_num = int(player_num)
-                if a <= player_num <= b:
+                if 1 <= player_num <= 100:
                     return player_num
+                print("Incorrect! Your guess isn't in the interval [1,100]")
         except ValueError as e:
-            pyautogui.alert(f'{e}')
+            print(f'{e}')
 
 
 def get_hint(player_num:int, computer_num:int) -> None:
     """Get hints to help the player guess the number"""
     if player_num < computer_num:
-        pyautogui.alert(f"Wrong number. Your number is lower.", "Hint")
+        print(f"Incorrect! The number is greater than {player_num}.")
     else:
-        pyautogui.alert(f"Wrong number. Your number is higher", "Hint")
+        print(f"Incorrect! The number is less than {player_num}.")
     return None
 
 
-def is_guessed(player_num:int, computer_num:int, chance:int) -> bool:
+def is_guessed(player_num:int, computer_num:int, attempt:int, start_time: float) -> bool:
     if computer_num == player_num:
-        pyautogui.alert(f"Congratulations, you guessed it. It took you {chance} chance", "Result")
+        end_time = time()
+        delay = int(end_time - start_time)
+        print(f"\nCongratulations! You guessed the correct number in {attempt} attempt and {delay}s")
         return True
     else:
         get_hint(player_num, computer_num)
         return False
 
 
+def add_highscore(score:int , highscore:list[int]) -> None:
+        highscore.append(score)
+
+
+def display_highscore(highscore:list[int]):
+    responce = input(f"\nDo you want to display the highscore [Y/N]").strip().lower()
+    if responce == "Yes" and highscore:
+        print(f"You highscore is {min(highscore)}")
+    elif not highscore:
+        print("No highscore available yet.")
+    return None
+
+
 def play() -> None:
     """Play the game"""
+    # Initialise the highscore list
+    highscore = []
+    
     # Select the interval and generate the number to guess
-    a, b = get_interval()
-    computer_num = randint(a, b+1)
+    computer_num = randint(1, 101)
+    print(computer_num)
 
     # Select the diffucilty and display a welcomin window
-    chance = select_difficulity()
-    welcoming(a, b, chance)
+    chance = select_difficulty()
+    welcoming(chance)
+
+    start_time = time()
+
     
     # Try to guess the number
     for attempt in range(1, chance+1):
-        player_num = guess(a, b, chance-attempt+1)
-        if is_guessed(player_num, computer_num, attempt):
+        player_num = guess(chance-attempt+1)
+        if is_guessed(player_num, computer_num, attempt, start_time):
+            add_highscore(attempt, highscore)
+            display_highscore(highscore)
             return None
-    
+
     # Displayt the message that the user lost
-    pyautogui.alert(f"You run out of chances, the number to guess was {computer_num}")
+    print(f"You run out of chances, the number to guess was {computer_num}")
     return None
     
 
@@ -117,7 +136,8 @@ def main():
         if play_game():
             play()
         else:
-            return None
+            print("Thanks for playing! Goodbye!")
+            break
 
 
 if __name__ == "__main__":
