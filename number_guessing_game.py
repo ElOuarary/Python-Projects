@@ -40,7 +40,7 @@ def select_difficulty() -> int:
     
     # Select the diffuclty level
     while True:
-        choice = input("Enter your choice: ")
+        choice = input("Enter your choice: ").strip()
         # Check if the input number exists in the difficulty dictionary 
         if choice in difficulity.keys():
             # Print a message of the difficulty chosen and return the number of chances
@@ -102,9 +102,9 @@ def add_highscore(score:int , highscore:list[int]) -> None:
 
 def display_highscore(highscore:list[int]):
     """Ask the user weither to display their highscore or not"""
-    responce = input(f"\nDo you want to display the highscore [Y/N]").strip().lower()
+    responce = input(f"\nDo you want to display the highscore [Y/N]: ").strip().lower()
     if responce == "Yes" and highscore:
-        print(f"You highscore is {min(highscore)}")
+        print(f"\nYou highscore is {min(highscore)}")
     elif not highscore:
         print("No highscore available yet.")
     return None
@@ -117,7 +117,6 @@ def play() -> None:
     
     # Select the interval and generate the number to guess
     computer_num = randint(1, 101)
-    print(computer_num)
 
     # Select the diffucilty and display a welcomin window
     chance = select_difficulty()
