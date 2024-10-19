@@ -59,7 +59,7 @@ def valid_input(x:str) -> bool:
     return True
 
 
-def guess(chance:int) -> int:
+def guess() -> int:
     """Get the player guessed number that fit in the interval [a,b]"""
     while True:
         try:
